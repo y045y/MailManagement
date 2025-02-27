@@ -42,15 +42,7 @@ app.get('/clients', async (req, res) => {
     }
 });
 
-// API: 請求データ取得
-app.get('/invoices', async (req, res) => {
-    try {
-        const result = await sql.query('SELECT * FROM Invoices');
-        res.json(result.recordset);
-    } catch (err) {
-        res.status(500).json({ error: 'データ取得エラー' });
-    }
-});
+
 
 app.post('/clients', async (req, res) => {
     try {
@@ -91,39 +83,89 @@ app.post('/clients', async (req, res) => {
     }
 });
 
-app.post('/mails', async (req, res) => {
-    try {
-        const { received_date, company_name, category, description, transfer_date, payment_deadline } = req.body;
 
-        console.log("受信データ:", req.body); // デバッグ用
+app.delete("/clients/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const query = "DELETE FROM Clients WHERE id = @id";
+        const request = new sql.Request();
+        request.input("id", sql.Int, id);
+        
+        const result = await request.query(query); // ✅ 結果を取得
+        if (result.rowsAffected[0] === 0) {
+            return res.status(404).json({ error: "削除対象の取引先が見つかりません" });
+        }
+
+        res.json({ message: "取引先を削除しました" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "削除エラー" });
+    }
+});
+
+
+/**
+ * 取引先の修正 (更新)
+ */
+app.put("/clients/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { company_name, bank_name, branch_name, account_number, account_type, payment_method } = req.body;
 
         const query = `
-            INSERT INTO Mails (received_date, company_name, category, description, transfer_date, payment_deadline)
-            VALUES (@received_date, @company_name, @category, @description, @transfer_date, @payment_deadline)
+            UPDATE Clients
+            SET company_name = @company_name,
+                bank_name = @bank_name,
+                branch_name = @branch_name,
+                account_number = @account_number,
+                account_type = @account_type,
+                payment_method = @payment_method
+            WHERE id = @id
         `;
 
         const request = new sql.Request();
-        request.input('received_date', sql.Date, received_date);
-        request.input('company_name', sql.NVarChar, company_name);
-        request.input('category', sql.NVarChar, category);
-        request.input('description', sql.NVarChar, description || '');
-        request.input('transfer_date', sql.Date, transfer_date || null);
-        request.input('payment_deadline', sql.Date, payment_deadline || null);
-
-        console.log("DB登録データ:", {
-            received_date,
-            company_name,
-            category,
-            description,
-            transfer_date,
-            payment_deadline
-        }); // デバッグ用
+        request.input("id", sql.Int, id);
+        request.input("company_name", sql.NVarChar, company_name);
+        request.input("bank_name", sql.NVarChar, bank_name);
+        request.input("branch_name", sql.NVarChar, branch_name);
+        request.input("account_number", sql.NVarChar, account_number);
+        request.input("account_type", sql.NVarChar, account_type);
+        request.input("payment_method", sql.NVarChar, payment_method);
 
         await request.query(query);
-        res.status(201).json({ message: '郵便物が登録されました' });
+        res.json({ message: "取引先情報を更新しました" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "更新エラー" });
+    }
+});
+
+
+app.post('/mails', async (req, res) => {
+    try {
+        const { received_date, client_id, category, amount, transfer_date, payment_deadline, description } = req.body;
+
+
+        const query = `
+        INSERT INTO Mails (received_date, client_id, category, amount, transfer_date, payment_deadline, description)
+        VALUES (@received_date, @client_id, @category, @amount, @transfer_date, @payment_deadline, @description)
+            `;
+            
+            const request = new sql.Request();
+            request.input('received_date', sql.Date, received_date);
+            request.input('client_id', sql.Int, client_id);  // 🔄 変更
+            request.input('category', sql.NVarChar, category);
+            request.input('amount', sql.Decimal(18,2), amount);
+            request.input('transfer_date', sql.Date, transfer_date || null);
+            request.input('payment_deadline', sql.Date, payment_deadline || null);
+            request.input('description', sql.NVarChar, description);
+            
+
+        await request.query(query);
+        res.status(201).json({ message: '郵便物が追加されました' });
 
     } catch (err) {
-        console.error("DBエラー:", err);
+        console.error(err);
         res.status(500).json({ error: 'データ追加エラー' });
     }
 });
@@ -132,7 +174,22 @@ app.post('/mails', async (req, res) => {
 
 app.get('/mails', async (req, res) => {
     try {
-        const result = await sql.query('SELECT * FROM Mails ORDER BY received_date DESC');
+        const query = `
+            SELECT 
+                Mails.id, 
+                Mails.received_date, 
+                Clients.company_name, 
+                Mails.category, 
+                Mails.amount, 
+                Mails.description, 
+                Mails.transfer_date, 
+                Mails.payment_deadline 
+            FROM Mails
+            LEFT JOIN Clients ON Mails.client_id = Clients.id
+            ORDER BY Mails.received_date ASC, Mails.id ASC  -- ✅ 修正
+        `;
+
+        const result = await sql.query(query);
         res.json(result.recordset);
     } catch (err) {
         res.status(500).json({ error: 'データ取得エラー' });
@@ -140,6 +197,60 @@ app.get('/mails', async (req, res) => {
 });
 
 
+/**
+ * 郵便物の削除
+ */
+app.delete("/mails/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const query = "DELETE FROM Mails WHERE id = @id";
+        const request = new sql.Request();
+        request.input("id", sql.Int, id);
+        await request.query(query);
+        res.json({ message: "郵便物を削除しました" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "削除エラー" });
+    }
+});
+
+/**
+ * 郵便物の修正 (更新)
+ */
+app.put("/mails/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { received_date, client_id, category, amount, transfer_date, payment_deadline, description } = req.body;
+
+        const query = `
+            UPDATE Mails
+            SET received_date = @received_date,
+                client_id = @client_id,  -- 修正: company_name → client_id
+                category = @category,
+                amount = @amount,
+                transfer_date = @transfer_date,
+                payment_deadline = @payment_deadline,
+                description = @description
+            WHERE id = @id
+        `;
+
+        const request = new sql.Request();
+        request.input("id", sql.Int, id);
+        request.input("received_date", sql.Date, received_date);
+        request.input("client_id", sql.Int, client_id);  // 修正: company_name ではなく client_id
+        request.input("category", sql.NVarChar, category);
+        request.input("amount", sql.Decimal(18, 2), amount);
+        request.input("transfer_date", sql.Date, transfer_date || null);
+        request.input("payment_deadline", sql.Date, payment_deadline || null);
+        request.input("description", sql.NVarChar, description);
+
+        await request.query(query);
+        res.json({ message: "郵便物情報を更新しました" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "更新エラー" });
+    }
+});
 
 // サーバー起動
 const PORT = process.env.PORT || 5000;
