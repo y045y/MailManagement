@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
-const ClientList = ({ onEditClient, onDeleteClient }) => {
-    const [clients, setClients] = useState([]);
-
+const ClientList = ({ clients, setClients, onEditClient, onDeleteClient }) => {
     useEffect(() => {
         fetch("http://localhost:5000/clients")
             .then(response => response.json())
             .then(data => setClients(data))
             .catch(error => console.error("データ取得エラー:", error));
-    }, []);
+    }, [setClients]); // クライアントリストが更新されたら再取得
 
     return (
         <div>

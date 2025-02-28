@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 const MailList = ({ mails, setMails, onEditMail }) => {
     useEffect(() => {
@@ -6,7 +6,7 @@ const MailList = ({ mails, setMails, onEditMail }) => {
             .then(response => response.json())
             .then(data => setMails(data))
             .catch(error => console.error("データ取得エラー:", error));
-    }, []);
+    }, [setMails]);
 
     // 郵便物の削除処理
     const handleDelete = async (id) => {
