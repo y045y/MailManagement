@@ -29,17 +29,17 @@ const MailForm = ({ onSubmit, editMail, setEditingMail, refreshMails }) => {
         }
     };
 
-    // 編集モードの場合は `formData` を更新
+    // 編集モード時に `formData` を更新
     useEffect(() => {
         if (editMail) {
             console.log("編集モード: ", editMail);
             setFormData({
-                received_date: editMail.received_date || "",
+                received_date: editMail.received_date ? editMail.received_date.split("T")[0] : "",
                 client_id: editMail.client_id || "",
                 category: editMail.category || "",
                 amount: editMail.amount || "",
-                transfer_date: editMail.transfer_date || "",
-                payment_deadline: editMail.payment_deadline || "",
+                transfer_date: editMail.transfer_date ? editMail.transfer_date.split("T")[0] : "",
+                payment_deadline: editMail.payment_deadline ? editMail.payment_deadline.split("T")[0] : "",
                 description: editMail.description || "",
             });
         }
