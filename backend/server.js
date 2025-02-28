@@ -87,11 +87,23 @@ app.post('/clients', async (req, res) => {
 app.delete("/clients/:id", async (req, res) => {
     try {
         const { id } = req.params;
+
+        // `Mails` にこの `client_id` が存在するかチェック
+        const checkQuery = "SELECT COUNT(*) AS count FROM Mails WHERE client_id = @id";
+        const checkRequest = new sql.Request();
+        checkRequest.input("id", sql.Int, id);
+        const checkResult = await checkRequest.query(checkQuery);
+
+        if (checkResult.recordset[0].count > 0) {
+            return res.status(400).json({ error: "この取引先に関連する郵便物があるため削除できません" });
+        }
+
+        // クライアント削除処理
         const query = "DELETE FROM Clients WHERE id = @id";
         const request = new sql.Request();
         request.input("id", sql.Int, id);
-        
-        const result = await request.query(query); // ✅ 結果を取得
+        const result = await request.query(query);
+
         if (result.rowsAffected[0] === 0) {
             return res.status(404).json({ error: "削除対象の取引先が見つかりません" });
         }
