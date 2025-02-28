@@ -1,38 +1,27 @@
-import React, { useEffect } from "react";
+import React from "react";
+import { Table, Button, Container } from "react-bootstrap";
 
 const MailList = ({ mails, setMails, onEditMail }) => {
-    useEffect(() => {
-        fetch("http://localhost:5000/mails")
-            .then(response => response.json())
-            .then(data => setMails(data))
-            .catch(error => console.error("データ取得エラー:", error));
-    }, [setMails]);
-
-    // 郵便物の削除処理
     const handleDelete = async (id) => {
         if (!window.confirm("本当に削除しますか？")) return;
 
         try {
             await fetch(`http://localhost:5000/mails/${id}`, { method: "DELETE" });
-
-            // フロント側でも即時反映
             setMails(mails.filter(mail => mail.id !== id));
         } catch (error) {
             console.error("削除エラー:", error);
         }
     };
 
-    // 日付を "M/D" 形式に変換
     const formatDate = (dateString) => {
         if (!dateString) return "なし";
-        const date = new Date(dateString);
-        return `${date.getMonth() + 1}/${date.getDate()}`;
+        return new Date(dateString).toLocaleDateString("ja-JP", { month: "numeric", day: "numeric" });
     };
 
     return (
-        <div>
+        <Container>
             <h2>📬 郵便物一覧</h2>
-            <table border="1">
+            <Table striped bordered hover>
                 <thead>
                     <tr>
                         <th>届いた日</th>
@@ -56,14 +45,14 @@ const MailList = ({ mails, setMails, onEditMail }) => {
                             <td>{formatDate(mail.transfer_date)}</td>
                             <td>{formatDate(mail.payment_deadline)}</td>
                             <td>
-                                <button onClick={() => onEditMail(mail)}>編集</button>
-                                <button onClick={() => handleDelete(mail.id)}>削除</button>
+                                <Button variant="warning" size="sm" onClick={() => onEditMail(mail)}>編集</Button>
+                                <Button variant="danger" size="sm" className="ms-2" onClick={() => handleDelete(mail.id)}>削除</Button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
-            </table>
-        </div>
+            </Table>
+        </Container>
     );
 };
 
