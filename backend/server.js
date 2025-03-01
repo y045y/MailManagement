@@ -32,26 +32,24 @@ async function connectDB() {
 }
 connectDB();
 
-// API: 取引先リスト取得
+// 取引先リスト取得 (GET)
 app.get('/clients', async (req, res) => {
     try {
-        const result = await sql.query('SELECT * FROM Clients');
+        const result = await sql.query('SELECT id, company_name, bank_name, branch_name, account_number, account_type, payment_method, transaction_details FROM Clients');
         res.json(result.recordset);
     } catch (err) {
+        console.error(err);
         res.status(500).json({ error: 'データ取得エラー' });
     }
 });
 
-
-
+// 取引先追加 (POST)
 app.post('/clients', async (req, res) => {
     try {
-        const { company_name, bank_name, branch_name, account_number, account_type, payment_method } = req.body;
+        const { company_name, bank_name, branch_name, account_number, account_type, payment_method, transaction_details } = req.body;
 
-        // まずは、同じ会社名が存在しないかチェック
-        const checkQuery = `
-            SELECT COUNT(*) AS count FROM Clients WHERE company_name = @company_name
-        `;
+        // 会社名の重複チェック
+        const checkQuery = `SELECT COUNT(*) AS count FROM Clients WHERE company_name = @company_name`;
         const checkRequest = new sql.Request();
         checkRequest.input('company_name', sql.NVarChar, company_name);
         const checkResult = await checkRequest.query(checkQuery);
@@ -60,10 +58,10 @@ app.post('/clients', async (req, res) => {
             return res.status(400).json({ error: "この会社名はすでに登録されています。" });
         }
 
-        // 会社情報を追加
+        // 取引先情報を追加
         const query = `
-            INSERT INTO Clients (company_name, bank_name, branch_name, account_number, account_type, payment_method)
-            VALUES (@company_name, @bank_name, @branch_name, @account_number, @account_type, @payment_method)
+            INSERT INTO Clients (company_name, bank_name, branch_name, account_number, account_type, payment_method, transaction_details)
+            VALUES (@company_name, @bank_name, @branch_name, @account_number, @account_type, @payment_method, @transaction_details)
         `;
 
         const request = new sql.Request();
@@ -73,6 +71,7 @@ app.post('/clients', async (req, res) => {
         request.input('account_number', sql.NVarChar, account_number);
         request.input('account_type', sql.NVarChar, account_type);
         request.input('payment_method', sql.NVarChar, payment_method);
+        request.input('transaction_details', sql.NVarChar, transaction_details || "未設定");
 
         await request.query(query);
         res.status(201).json({ message: '取引先が追加されました' });
@@ -83,7 +82,7 @@ app.post('/clients', async (req, res) => {
     }
 });
 
-
+// 取引先削除 (DELETE)
 app.delete("/clients/:id", async (req, res) => {
     try {
         const { id } = req.params;
@@ -115,14 +114,11 @@ app.delete("/clients/:id", async (req, res) => {
     }
 });
 
-
-/**
- * 取引先の修正 (更新)
- */
+// 取引先の修正 (PUT)
 app.put("/clients/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const { company_name, bank_name, branch_name, account_number, account_type, payment_method } = req.body;
+        const { company_name, bank_name, branch_name, account_number, account_type, payment_method, transaction_details } = req.body;
 
         const query = `
             UPDATE Clients
@@ -131,7 +127,8 @@ app.put("/clients/:id", async (req, res) => {
                 branch_name = @branch_name,
                 account_number = @account_number,
                 account_type = @account_type,
-                payment_method = @payment_method
+                payment_method = @payment_method,
+                transaction_details = @transaction_details
             WHERE id = @id
         `;
 
@@ -143,6 +140,7 @@ app.put("/clients/:id", async (req, res) => {
         request.input("account_number", sql.NVarChar, account_number);
         request.input("account_type", sql.NVarChar, account_type);
         request.input("payment_method", sql.NVarChar, payment_method);
+        request.input("transaction_details", sql.NVarChar, transaction_details || "未設定");
 
         await request.query(query);
         res.json({ message: "取引先情報を更新しました" });
@@ -263,6 +261,28 @@ app.put("/mails/:id", async (req, res) => {
         res.status(500).json({ error: "更新エラー" });
     }
 });
+
+app.get("/payments", async (req, res) => {
+    try {
+        const { month, year } = req.query;
+        if (!month || !year) {
+            return res.status(400).json({ error: "month と year は必須です" });
+        }
+
+        const pool = await sql.connect(dbConfig);
+        const result = await pool
+            .request()
+            .input("TargetMonth", sql.Int, parseInt(month))
+            .input("TargetYear", sql.Int, parseInt(year))
+            .execute("GetPaymentsByMonth");
+
+        res.json(result.recordsets); // 結果をJSONで返す
+    } catch (err) {
+        console.error("ストアド実行エラー:", err);
+        res.status(500).json({ error: "データ取得エラー" });
+    }
+});
+
 
 // サーバー起動
 const PORT = process.env.PORT || 5000;

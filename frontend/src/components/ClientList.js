@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { Table, Button, Container } from "react-bootstrap";
 
 const ClientList = ({ clients, setClients, onEditClient, onDeleteClient }) => {
     useEffect(() => {
@@ -9,10 +10,10 @@ const ClientList = ({ clients, setClients, onEditClient, onDeleteClient }) => {
     }, [setClients]); // クライアントリストが更新されたら再取得
 
     return (
-        <div>
+        <Container className="mt-4">
             <h2>📋 取引先一覧</h2>
-            <table border="1">
-                <thead>
+            <Table striped bordered hover responsive>
+                <thead className="table-dark">
                     <tr>
                         <th>会社名</th>
                         <th>銀行名</th>
@@ -20,6 +21,7 @@ const ClientList = ({ clients, setClients, onEditClient, onDeleteClient }) => {
                         <th>口座番号</th>
                         <th>口座種別</th>
                         <th>支払い方法</th>
+                        <th>取引内容</th> {/* 追加 */}
                         <th>操作</th>
                     </tr>
                 </thead>
@@ -32,15 +34,29 @@ const ClientList = ({ clients, setClients, onEditClient, onDeleteClient }) => {
                             <td>{client.account_number || "なし"}</td>
                             <td>{client.account_type}</td>
                             <td>{client.payment_method}</td>
+                            <td>{client.transaction_details || "なし"}</td> {/* 取引内容を操作の左隣に配置 */}
                             <td>
-                                <button onClick={() => onEditClient(client)}>編集</button>
-                                <button onClick={() => onDeleteClient(client.id)}>削除</button>
+                                <Button 
+                                    variant="warning" 
+                                    size="sm" 
+                                    className="me-2"
+                                    onClick={() => onEditClient(client)}
+                                >
+                                    編集
+                                </Button>
+                                <Button 
+                                    variant="danger" 
+                                    size="sm"
+                                    onClick={() => onDeleteClient(client.id)}
+                                >
+                                    削除
+                                </Button>
                             </td>
                         </tr>
                     ))}
                 </tbody>
-            </table>
-        </div>
+            </Table>
+        </Container>
     );
 };
 

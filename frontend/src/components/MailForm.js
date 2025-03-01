@@ -64,58 +64,112 @@ const MailForm = ({ onSubmit, editMail, setEditingMail, refreshMails }) => {
     };
 
     return (
-        <Container className="mb-4">
-            <h2 className="mb-3">{editMail ? "📄 郵便物を編集" : "📬 郵便物を登録"}</h2>
-            <Form onSubmit={handleSubmit}>
+        <Container className="mt-4">
+            <h2 className="text-center">{editMail ? "📄 郵便物を編集" : "📬 郵便物を登録"}</h2>
+            <Form onSubmit={handleSubmit} className="p-3 border rounded bg-light shadow-sm">
+                
+                {/* 1行目: 届いた日・会社名・区分 */}
                 <Row className="mb-3">
-                    <Col>
-                        <Form.Label>届いた日</Form.Label>
-                        <Form.Control type="date" name="received_date" value={formData.received_date} onChange={handleChange} required />
+                    <Col md={4}>
+                        <Form.Group controlId="received_date">
+                            <Form.Label>届いた日</Form.Label>
+                            <Form.Control 
+                                type="date" 
+                                name="received_date" 
+                                value={formData.received_date} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                        </Form.Group>
                     </Col>
-                    <Col>
-                        <Form.Label>会社</Form.Label>
-                        <Form.Select name="client_id" value={formData.client_id} onChange={handleChange} required>
-                            <option value="">選択してください</option>
-                            {clients.map(client => (
-                                <option key={client.id} value={client.id}>{client.company_name}</option>
-                            ))}
-                        </Form.Select>
+                    <Col md={4}>
+                        <Form.Group controlId="client_id">
+                            <Form.Label>会社</Form.Label>
+                            <Form.Select name="client_id" value={formData.client_id} onChange={handleChange} required>
+                                <option value="">選択してください</option>
+                                {clients.map(client => (
+                                    <option key={client.id} value={client.id}>{client.company_name}</option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
                     </Col>
-                    <Col>
-                        <Form.Label>区分</Form.Label>
-                        <Form.Select name="category" value={formData.category} onChange={handleChange} required>
-                            <option value="">選択してください</option>
-                            {categories.map((cat, index) => (
-                                <option key={index} value={cat}>{cat}</option>
-                            ))}
-                        </Form.Select>
+                    <Col md={4}>
+                        <Form.Group controlId="category">
+                            <Form.Label>区分</Form.Label>
+                            <Form.Select name="category" value={formData.category} onChange={handleChange} required>
+                                <option value="">選択してください</option>
+                                {categories.map((cat, index) => (
+                                    <option key={index} value={cat}>{cat}</option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
                     </Col>
                 </Row>
 
+                {/* 2行目: 金額・内容・振替日・振込期限 */}
                 <Row className="mb-3">
-                    <Col>
-                        <Form.Label>金額</Form.Label>
-                        <Form.Control type="number" name="amount" value={formData.amount} onChange={handleChange} required />
+                    <Col md={3}>
+                        <Form.Group controlId="amount">
+                            <Form.Label>金額</Form.Label>
+                            <Form.Control 
+                                type="number" 
+                                name="amount" 
+                                placeholder="金額を入力" 
+                                value={formData.amount} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                        </Form.Group>
                     </Col>
-                    <Col>
-                        <Form.Label>内容</Form.Label>
-                        <Form.Control type="text" name="description" value={formData.description} onChange={handleChange} required />
+                    <Col md={3}>
+                        <Form.Group controlId="description">
+                            <Form.Label>内容</Form.Label>
+                            <Form.Control 
+                                type="text" 
+                                name="description" 
+                                placeholder="内容を入力" 
+                                value={formData.description} 
+                                onChange={handleChange} 
+                                required 
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md={3}>
+                        <Form.Group controlId="transfer_date">
+                            <Form.Label>振替日</Form.Label>
+                            <Form.Control 
+                                type="date" 
+                                name="transfer_date" 
+                                value={formData.transfer_date} 
+                                onChange={handleChange} 
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md={3}>
+                        <Form.Group controlId="payment_deadline">
+                            <Form.Label>振込期限</Form.Label>
+                            <Form.Control 
+                                type="date" 
+                                name="payment_deadline" 
+                                value={formData.payment_deadline} 
+                                onChange={handleChange} 
+                            />
+                        </Form.Group>
                     </Col>
                 </Row>
 
-                <Row className="mb-3">
-                    <Col>
-                        <Form.Label>振替日</Form.Label>
-                        <Form.Control type="date" name="transfer_date" value={formData.transfer_date} onChange={handleChange} />
-                    </Col>
-                    <Col>
-                        <Form.Label>振込期限</Form.Label>
-                        <Form.Control type="date" name="payment_deadline" value={formData.payment_deadline} onChange={handleChange} />
-                    </Col>
-                </Row>
+                {/* ボタンエリア */}
+                <div className="text-center">
+                    <Button variant="primary" type="submit" className="me-2">
+                        {editMail ? "更新" : "登録"}
+                    </Button>
+                    {editMail && (
+                        <Button variant="secondary" onClick={() => setEditingMail(null)}>
+                            キャンセル
+                        </Button>
+                    )}
+                </div>
 
-                <Button variant="primary" type="submit">{editMail ? "更新" : "登録"}</Button>
-                {editMail && <Button variant="secondary" className="ms-2" onClick={() => setEditingMail(null)}>キャンセル</Button>}
             </Form>
         </Container>
     );
