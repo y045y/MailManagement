@@ -104,76 +104,101 @@ body {
 h1, h2, h3, h4, h5 {
   color: #f2f2f2;
 }
-/* 🟢 全体の背景色を濃いグレーに */
+/* 🟢 bootstrapのスタイルを上書きするために!importantを使用 */
 body {
-  background-color: #222; /* 濃いグレー */
-  color: #f2f2f2; /* 白っぽい文字 */
-  font-family: 'NotoSansJP', sans-serif;
+  background-color: #222 !important; /* 濃いグレー */
+  color: #f2f2f2 !important; /* 白っぽい文字 */
+  font-family: 'NotoSansJP', sans-serif !important;
 }
 
-/* 🟢 メニューの背景色と文字色 */
-.menu, .sidebar {
-  background-color: #333; /* メニューの背景色 */
-  color: #f2f2f2;
-  border-color: #555; /* ボーダーも少し濃いグレーで */
+/* 🟢 bootstrapのcontainerも背景色とボーダーを上書き */
+.container, .card, .table, .form-control, .btn {
+  background-color: #333 !important; /* 少し明るいグレー */
+  color: #f2f2f2 !important;
+  border-color: #555 !important; /* ボーダーも少し濃いグレーで */
+}
+
+/* 🟢 input, select, textarea の背景と文字色 */
+input, select, textarea {
+  background-color: #444 !important; /* 入力欄は少し明るめ */
+  color: #f2f2f2 !important;
+  border: 1px solid #555 !important; /* ボーダーもグレー */
+}
+
+/* 🟢 input のプレースホルダーの色 */
+input::placeholder, select::placeholder, textarea::placeholder {
+  color: #bbb !important; /* 薄いグレー */
+}
+
+/* 🟢 ボタンの色とホバー */
+.btn-primary {
+  background-color: #555 !important;
+  border-color: #666 !important;
+}
+.btn-primary:hover {
+  background-color: #666 !important;
+  border-color: #777 !important;
 }
 
 /* 🟢 メニューリンクの色とホバー時の色 */
-.menu a, .sidebar a {
-  color: #ccc; /* 薄いグレー */
-  text-decoration: none;
+.nav-link, .menu a, .sidebar a {
+  color: #ccc !important; /* 薄いグレー */
+  text-decoration: none !important;
 }
 
-.menu a:hover, .sidebar a:hover {
-  color: #fff; /* ホバー時は白 */
-  background-color: #444; /* 背景色を少し濃く */
+.nav-link:hover, .menu a:hover, .sidebar a:hover {
+  color: #fff !important; /* ホバー時は白 */
+  background-color: #444 !important; /* 背景色を少し濃く */
 }
 
 /* 🟢 タイトルや見出しの色 */
 h1, h2, h3, h4, h5 {
-  color: #f2f2f2;
+  color: #f2f2f2 !important;
 }
 
-/* 🟢 メニューアイコンの背景色 */
-.menu-icon {
-  background-color: #444;
-  border-radius: 5px;
-  padding: 5px;
+/* 🟢 テーブルのヘッダー */
+.table thead th {
+  background-color: #444 !important;
+  color: #f2f2f2 !important;
 }
 
-/* 🟢 リストの点やアイコンの色 */
-ul, li {
-  color: #ccc;
+/* 🟢 テーブルのボーダー */
+.table, .table td, .table th {
+  border-color: #555 !important;
+}
+
+/* 🟢 モーダルの背景色とテキスト色 */
+.modal-content {
+  background-color: #333 !important;
+  color: #f2f2f2 !important;
 }
 
 /* 🟢 メニューの背景とボーダー */
 .menu {
-  background-color: #333; /* 少し明るいグレー */
-  border: 1px solid #444;
-  padding: 10px;
-  border-radius: 5px;
+  background-color: #333 !important;
+  border: 1px solid #444 !important;
+  padding: 10px !important;
+  border-radius: 5px !important;
 }
 
 /* 🟢 メニュー選択中の項目 */
-.menu a.active {
-  background-color: #444;
-  color: #fff;
+.menu a.active, .nav-link.active {
+  background-color: #444 !important;
+  color: #fff !important;
 }
 
-/* 🟢 メニューから選択してくださいのテキスト色 */
-.select-prompt {
-  color: #ccc; /* 薄いグレー */
+/* 🟢 カードの背景色とテキスト色 */
+.card {
+  background-color: #333 !important;
+  color: #f2f2f2 !important;
 }
 
-/* 🟢 メインコンテンツエリア */
-.main-content {
-  background-color: #333;
-  padding: 20px;
+/* 🟢 スクロールバーのカスタマイズ (必要なら) */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: #555;
   border-radius: 5px;
-  border: 1px solid #555;
 }
 
-/* 🟢 アイコンの色 */
-.menu-icon, .sidebar-icon {
-  filter: brightness(0.8); /* 少し暗く */
-}
