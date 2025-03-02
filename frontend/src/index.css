@@ -76,3 +76,43 @@ nav a {
 nav a:hover {
   background-color: #666 !important;
 }
+/* 🟢 Form全体の背景色を薄いグレーに */
+.container, .form-control, input, select, textarea {
+  background-color: #ddd !important;  /* 薄いグレー */
+  color: #333 !important;             /* 文字色は濃いグレー */
+  border-color: #bbb !important;      /* ボーダーも薄いグレー */
+}
+
+/* 🟢 ラベルは白にして見やすく */
+.form-label {
+  color: #333 !important;        /* 濃いグレーで見やすく */
+  font-weight: bold !important;  /* 太字で強調 */
+}
+
+/* 🟢 メニューや見出しの文字色を黒に設定 */
+h1, h2, h3, h4, h5, h6, .nav-link, .menu a, .sidebar a {
+  color: #333 !important;  /* 濃いグレーで見やすく */
+  font-weight: bold;       /* 太字で見やすく */
+}
+
+/* 🟢 メニューの背景色は薄いグレーに */
+.menu, .sidebar, .App-header {
+  background-color: #ddd !important;  /* 薄いグレーで見やすく */
+  border: 1px solid #bbb !important;  /* ボーダーも少し濃いグレーで */
+}
+
+/* 🟢 メニューリンクのホバー時の色 */
+.nav-link:hover, .menu a:hover, .sidebar a:hover {
+  color: #000 !important;            /* ホバー時は完全な黒 */
+  background-color: #ccc !important; /* 背景色は少し明るめのグレー */
+}
+
+/* 🟢 タイトルや見出しの色 */
+h1, h2, h3, h4, h5 {
+  color: #333 !important;  /* 濃いグレーで読みやすく */
+}
+
+/* 🟢 サイドメニューのリンクの色を黒に */
+.sidebar a {
+  color: #333 !important;  /* 濃いグレーで見やすく */
+}

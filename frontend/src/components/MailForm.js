@@ -68,11 +68,11 @@ const MailForm = ({ onSubmit, editMail, setEditingMail, refreshMails }) => {
             <h2 className="text-center">{editMail ? "📄 郵便物を編集" : "📬 郵便物を登録"}</h2>
             <Form onSubmit={handleSubmit} className="p-3 border rounded bg-light shadow-sm">
                 
-                {/* 1行目: 届いた日・会社名・区分 */}
+                {/* 1行目: 届いた日（短く）・会社名（広く）・区分（短く）・金額（標準） */}
                 <Row className="mb-3">
-                    <Col md={4}>
+                    <Col md={2}>
                         <Form.Group controlId="received_date">
-                            <Form.Label>届いた日</Form.Label>
+                            <Form.Label style={{ color: '#fff' }}>届いた日</Form.Label>
                             <Form.Control 
                                 type="date" 
                                 name="received_date" 
@@ -84,7 +84,7 @@ const MailForm = ({ onSubmit, editMail, setEditingMail, refreshMails }) => {
                     </Col>
                     <Col md={4}>
                         <Form.Group controlId="client_id">
-                            <Form.Label>会社</Form.Label>
+                            <Form.Label style={{ color: '#fff' }}>会社</Form.Label>
                             <Form.Select name="client_id" value={formData.client_id} onChange={handleChange} required>
                                 <option value="">選択してください</option>
                                 {clients.map(client => (
@@ -93,9 +93,9 @@ const MailForm = ({ onSubmit, editMail, setEditingMail, refreshMails }) => {
                             </Form.Select>
                         </Form.Group>
                     </Col>
-                    <Col md={4}>
+                    <Col md={2}>
                         <Form.Group controlId="category">
-                            <Form.Label>区分</Form.Label>
+                            <Form.Label style={{ color: '#fff' }}>区分</Form.Label>
                             <Form.Select name="category" value={formData.category} onChange={handleChange} required>
                                 <option value="">選択してください</option>
                                 {categories.map((cat, index) => (
@@ -104,13 +104,9 @@ const MailForm = ({ onSubmit, editMail, setEditingMail, refreshMails }) => {
                             </Form.Select>
                         </Form.Group>
                     </Col>
-                </Row>
-
-                {/* 2行目: 金額・内容・振替日・振込期限 */}
-                <Row className="mb-3">
-                    <Col md={3}>
+                    <Col md={4}>
                         <Form.Group controlId="amount">
-                            <Form.Label>金額</Form.Label>
+                            <Form.Label style={{ color: '#fff' }}>金額</Form.Label>
                             <Form.Control 
                                 type="number" 
                                 name="amount" 
@@ -121,9 +117,13 @@ const MailForm = ({ onSubmit, editMail, setEditingMail, refreshMails }) => {
                             />
                         </Form.Group>
                     </Col>
-                    <Col md={3}>
+                </Row>
+
+                {/* 2行目: 内容（広く）・振替日（短く）・振込期限（短く） */}
+                <Row className="mb-3">
+                    <Col md={6}>
                         <Form.Group controlId="description">
-                            <Form.Label>内容</Form.Label>
+                            <Form.Label style={{ color: '#fff' }}>内容</Form.Label>
                             <Form.Control 
                                 type="text" 
                                 name="description" 
@@ -136,7 +136,7 @@ const MailForm = ({ onSubmit, editMail, setEditingMail, refreshMails }) => {
                     </Col>
                     <Col md={3}>
                         <Form.Group controlId="transfer_date">
-                            <Form.Label>振替日</Form.Label>
+                            <Form.Label style={{ color: '#fff' }}>振替日</Form.Label>
                             <Form.Control 
                                 type="date" 
                                 name="transfer_date" 
@@ -147,7 +147,7 @@ const MailForm = ({ onSubmit, editMail, setEditingMail, refreshMails }) => {
                     </Col>
                     <Col md={3}>
                         <Form.Group controlId="payment_deadline">
-                            <Form.Label>振込期限</Form.Label>
+                            <Form.Label style={{ color: '#fff' }}>振込期限</Form.Label>
                             <Form.Control 
                                 type="date" 
                                 name="payment_deadline" 

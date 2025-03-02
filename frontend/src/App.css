@@ -202,3 +202,19 @@ h1, h2, h3, h4, h5 {
   border-radius: 5px;
 }
 
+.form-label {
+  display: block !important;
+  color: #fff !important;  /* 白色で強制的に見えるように */
+  font-weight: bold !important;  /* 太字で見やすく */
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7) !important;  /* 影をつけて読みやすく */
+}
+.form-control, input, select, textarea {
+  background-color: #555 !important;  /* 少し明るくしてコントラストUP */
+  color: #f2f2f2 !important;
+  border: 1px solid #777 !important;
+}
+.form-label {
+  color: #fff !important;
+  font-weight: bold !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5) !important;
+}
