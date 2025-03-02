@@ -3,58 +3,91 @@ import { Table, Button, Container } from "react-bootstrap";
 import PDFButton from "./PDFButton"; // ✅ PDF 出力用
 import axios from "axios"; // ✅ API コール用
 
+
+
 const MailList = ({ mails, setMails, onEditMail }) => {
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
    // 振込・振替データの初期値を空配列に修正
     const [paymentData, setPaymentData] = useState([[], [], [], [], []]); 
 
-    // ✅ `fetchMails` を `useEffect` より前に定義
+// ✅ `fetchMails` を `useEffect` より前に定義
     const fetchMails = useCallback(async () => {
         try {
+            console.log("📡 郵便物データ取得開始...");
+            console.log(`📡 APIリクエスト: http://localhost:5000/mails?month=${currentMonth}&year=${currentYear}`);
+
             const response = await axios.get("http://localhost:5000/mails", {
                 params: {
                     month: currentMonth,
                     year: currentYear // 🔄 修正: 年も送信
                 }
             });
+
+            console.log("📦 取得した郵便物データ:", response.data);
             setMails(response.data);
         } catch (error) {
-            console.error("郵便物データ取得エラー:", error);
+            console.error("🛑 郵便物データ取得エラー:", error);
         }
     }, [setMails, currentMonth, currentYear]);
 
-    // ✅ `fetchPayments` で振込・振替データ取得
     const fetchPayments = useCallback(async () => {
         try {
+            console.log("📡 振込・振替データ取得開始...");
             const response = await axios.get(`http://localhost:5000/payments`, {
                 params: { 
                     month: currentMonth,
-                    year: currentYear  // 🛠 修正: 年も送信
+                    year: currentYear
                 }
             });
-
+            
             const data = response.data;
-            if (Array.isArray(data) && data.length >= 5) {
-                setPaymentData(data);  // 🛠 全体のレスポンスを設定
+            console.log("📦 取得した振込・振替データ:", data);
+            
+            if (Array.isArray(data) && data.length > 0) {
+                console.log("✅ データを setPaymentData に設定開始...");
+                setPaymentData(data);
+                console.log("✅ setPaymentData に設定完了:", data);
+                console.log("🔄 setPaymentData 直後の paymentData:", paymentData);
             } else {
-                console.error("API のレスポンスが不正です:", data);
-                setPaymentData([[], [], [], [], []]);  // 🛠 想定外なら空に
+                console.warn("⚠️ API のレスポンスが空です。デフォルト値を設定します。");
+                setPaymentData([[], [], [], [], []]);
             }
         } catch (error) {
-            console.error("振込・振替データ取得エラー:", error);
+            console.error("🛑 振込・振替データ取得エラー:", error);
+            setPaymentData([[], [], [], [], []]);
         }
-    }, [currentMonth, currentYear]);
-
-    // ✅ `useEffect` でデータ取得
+    }, [currentMonth, currentYear]);  // 🟢 ここを修正！
+    
+    
+    
+    
     useEffect(() => {
+        console.log("🟢 paymentData が更新されました:", paymentData);
+    }, [paymentData]);
+    
+    // 🟢 ローディング状態管理
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        console.log("🌟 useEffect 開始: ", { currentMonth, currentYear });
         const getData = async () => {
+            setIsLoading(true);  // 🔄 データ取得開始時にローディングを true に
             await fetchMails();
             await fetchPayments();
+            setIsLoading(false);  // 🔄 データ取得完了後にローディングを false に
         };
         getData();
-    }, [fetchMails, fetchPayments]);    
+    }, [fetchMails, fetchPayments, currentMonth, currentYear]);
 
+    useEffect(() => {
+        if (paymentData && paymentData.length > 0) {
+            console.log("🟢 paymentData が更新されました:", paymentData);
+        }
+        console.log("📡 fetchPayments 完了: paymentData =", paymentData);
+    }, [paymentData]);
+    
+        
     const handleDelete = async (id) => {
         if (!window.confirm("本当に削除しますか？")) return;
         try {
@@ -114,21 +147,29 @@ const MailList = ({ mails, setMails, onEditMail }) => {
                     次月
                 </Button>
             </div>
-                        {/* 🔄 PDF 出力ボタンは右寄せ */}
             <div className="d-flex justify-content-end mb-3">
-                <PDFButton 
-                    mails={mails} 
-                    currentMonth={currentMonth} 
-                    type="mail" 
-                    buttonText="郵便物 PDF" 
-                    className="me-2"  // 🔄 横に並べるためのマージン
-                />
-                <PDFButton 
-                    mails={paymentData} 
-                    currentMonth={currentMonth} 
-                    buttonText="振込・振替 PDF" 
-                />
-            </div>
+    {!isLoading && (
+        <>
+            <PDFButton 
+                mails={mails} 
+                currentMonth={currentMonth} 
+                type="mail" 
+                buttonText="郵便物 PDF" 
+                className="me-2"
+                key={`mail-${currentMonth}-${mails.length}`}
+            />
+            <PDFButton 
+                mails={mails} 
+                payments={paymentData}  // 🔄 `paymentData` 全体を渡す
+                currentMonth={currentMonth} 
+                type="payment" 
+                buttonText="振込・振替 PDF" 
+                key={`payment-${currentMonth}-${paymentData.length}-${JSON.stringify(paymentData)}`} 
+            />
+        </>
+    )}
+</div>
+
 
             <h5 className="text-center">{currentMonth}月の郵便物</h5>
 

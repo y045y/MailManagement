@@ -1,13 +1,78 @@
 body {
+  background-color: #333 !important;  /* 濃いグレー */
+  color: #f2f2f2 !important;          /* 薄いグレー */
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+}
+
+.container {
+  background-color: #444 !important;  /* ちょっと薄いグレー */
+  padding: 20px;
+  border-radius: 8px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #f2f2f2 !important;  /* タイトルの色を薄いグレー */
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+      monospace;
+  background-color: #555 !important;  /* コード部分もグレーに */
+  color: #f2f2f2 !important;
+}
+input, select, textarea {
+  background-color: #555 !important;  /* 入力欄はさらに薄いグレー */
+  color: #f2f2f2 !important;
+  border: 1px solid #777 !important;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+button {
+  background-color: #666 !important;  /* ボタンは中間のグレー */
+  color: #f2f2f2 !important;
+  border: 1px solid #777 !important;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #777 !important;  /* ホバー時は少し明るく */
+}
+table {
+  background-color: #444 !important;
+  color: #f2f2f2 !important;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  background-color: #555 !important;
+  color: #f2f2f2 !important;
+  padding: 5px;
+  border: 1px solid #666;
+}
+
+td {
+  background-color: #444 !important;
+  color: #f2f2f2 !important;
+  padding: 5px;
+  border: 1px solid #555;
+}
+
+tr:nth-child(even) td {
+  background-color: #505050 !important;  /* 偶数行は少し明るく */
+}
+nav a {
+  color: #f2f2f2 !important;
+  text-decoration: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: #555 !important;
+}
+
+nav a:hover {
+  background-color: #666 !important;
 }

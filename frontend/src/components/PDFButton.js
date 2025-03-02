@@ -1,73 +1,89 @@
-import React from "react";
-import { PDFDownloadLink, Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
+import React, { useEffect } from "react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import MailManagementPDF from "./MailManagementPDF";
+import PaymentManagementPDF from "./PaymentManagementPDF"; // 🟢 新しく追加！
 
-// PDFのスタイル設定
-const styles = StyleSheet.create({
-    page: { padding: 20 },
-    title: { fontSize: 18, marginBottom: 10, textAlign: "center" },
-    table: { display: "table", width: "auto", borderStyle: "solid", borderWidth: 1, borderRightWidth: 0, borderBottomWidth: 0 },
-    tableRow: { flexDirection: "row" },
-    tableCol: { borderStyle: "solid", borderWidth: 1, borderLeftWidth: 0, borderTopWidth: 0, flex: 1, padding: 2 },
-    tableCell: { margin: 5, fontSize: 10 },
-    noDataText: { textAlign: "center", marginTop: 20, fontSize: 12, color: "grey" }
-});
+// 🟢 ボタンスタイル設定
+const buttonStyle = {
+    padding: "6px 12px",
+    backgroundColor: "#007bff",
+    color: "#fff",
+    borderRadius: "4px",
+    border: "none",
+    cursor: "pointer",
+    textDecoration: "none",
+    display: "inline-block",
+    marginRight: "10px"
+};
 
-// PDFドキュメント
-const PaymentPDFDocument = ({ mails, currentMonth }) => (
-    <Document>
-        <Page style={styles.page}>
-            <Text style={styles.title}>{currentMonth}月の振込・振替一覧</Text>
-            <View style={styles.table}>
-                {/* テーブルヘッダー */}
-                <View style={styles.tableRow}>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>種別</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>期限</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>会社名</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>金額</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>内容</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>銀行名</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>支店名</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>口座種別</Text></View>
-                    <View style={styles.tableCol}><Text style={styles.tableCell}>口座番号</Text></View>
-                </View>
-                {/* テーブルデータ */}
-                {mails.length > 0 ? (
-                    mails.map((mail, index) => (
-                        <View style={styles.tableRow} key={mail.id || index}>
-                            <View style={styles.tableCol}><Text style={styles.tableCell}>{mail.種別 || "なし"}</Text></View>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>
-                                    {mail.期限 ? new Date(mail.期限).toLocaleDateString("ja-JP") : "なし"}
-                                </Text>
-                            </View>
-                            <View style={styles.tableCol}><Text style={styles.tableCell}>{mail.会社名 || "不明な会社"}</Text></View>
-                            <View style={styles.tableCol}>
-                                <Text style={styles.tableCell}>{mail.金額?.toLocaleString() || "0"} 円</Text>
-                            </View>
-                            <View style={styles.tableCol}><Text style={styles.tableCell}>{mail.内容 || "なし"}</Text></View>
-                            <View style={styles.tableCol}><Text style={styles.tableCell}>{mail.銀行名 || "未登録"}</Text></View>
-                            <View style={styles.tableCol}><Text style={styles.tableCell}>{mail.支店名 || "未登録"}</Text></View>
-                            <View style={styles.tableCol}><Text style={styles.tableCell}>{mail.口座種別 || "未設定"}</Text></View>
-                            <View style={styles.tableCol}><Text style={styles.tableCell}>{mail.口座番号 || "未登録"}</Text></View>
-                        </View>
-                    ))
-                ) : (
-                    <Text style={styles.noDataText}>データがありません</Text>
-                )}
-            </View>
-        </Page>
-    </Document>
-);
+// 🟢 PDFButton コンポーネント
+const PDFButton = ({
+    mails = [],
+    payments = [],
+    currentMonth = 1,
+    buttonText = "PDF出力",
+    type = "mail"
+}) => {
+    console.log("📦 PDFButton に渡された mails:", mails);
+    console.log("📦 PDFButton に渡された payments:", payments);
 
-// PDF出力ボタン
-const PDFButton = ({ mails = [], currentMonth = 1, buttonText = "PDF出力" }) => (
-    <PDFDownloadLink
-        document={<PaymentPDFDocument mails={mails} currentMonth={currentMonth} />}
-        fileName={`振込振替一覧_${currentMonth}月.pdf`}
-        className="btn btn-primary me-2"
-    >
-        {({ loading }) => (loading ? "出力中..." : buttonText)}
-    </PDFDownloadLink>
-);
+    // 🟢 コンポーネントのマウント時にログ出力
+    useEffect(() => {
+        console.log("🟢 PDFButton に渡された mails:", mails);
+        console.log("🟢 PDFButton に渡された payments:", payments);
+    }, [mails, payments]);
+
+    // 🟠 データが空の場合の表示
+    if (
+        (mails.length === 0 || mails.every(array => array.length === 0)) &&
+        (payments.length === 0 || payments.every(array => array.length === 0))
+    ) {
+        console.log("⚠️ データが空です！");
+        return <span style={{ color: "red" }}>データがありません</span>;
+    }
+
+    // 🟢 `type` によって使う PDF コンポーネントを切り替え
+    const DocumentComponent = type === "mail" ? MailManagementPDF : PaymentManagementPDF;
+    const data = type === "mail" ? mails : payments;
+    const fileName = type === "mail"
+        ? `郵便物一覧_${currentMonth}月.pdf`
+        : `振込振替一覧_${currentMonth}月.pdf`;
+
+    // 🟢 PDFDownloadLink コンポーネントで PDF を生成してダウンロード
+    return (
+        <PDFDownloadLink
+            document={
+                <DocumentComponent
+                    mails={type === "mail" ? mails : []}
+                    payments={type === "payment" ? payments : []}
+                    currentMonth={currentMonth}
+                />
+            }
+            fileName={fileName}
+            style={buttonStyle}
+            key={`${type}-${currentMonth}-${data.length}`}  // 🔄 再レンダリング用のキーを追加
+        >
+            {({ blob, url, loading, error }) => {
+                if (error) {
+                    console.log("🛑 PDF生成エラー:", error.message);
+                    return <span style={{ color: "red" }}>エラー: {error.message}</span>;
+                }
+
+                if (loading) {
+                    console.log("📄 PDFを生成中...");
+                    return <span style={{ color: "gray" }}>出力中...</span>;
+                }
+
+                console.log("📦 PDFButton に渡された mails:", mails);
+                console.log("📦 PDFButton に渡された payments:", payments);  // 🔄 ここを確認
+                console.log("📦 paymentData[0]:", payments[0]);                // 🔄 ここも確認
+                console.log("📦 paymentData[1]:", payments[1]);                // 🔄 ここも確認
+                
+
+                return buttonText;
+            }}
+        </PDFDownloadLink>
+    );
+};
 
 export default PDFButton;
